@@ -22,8 +22,6 @@ dotenv.config();
 
 app.use(express.json());
 app.use(cors(corsOptions));
-app.use(express.static(__dirname + "/public/"));
-
 app.use(express.urlencoded({ extended: false }));
 app.use(cookies());
 
@@ -35,7 +33,7 @@ app.get("/", (req, res) => {
   res.status(200).json("welcome");
 });
 app.get("/add-product", requireAuth, (req, res) => {
-  res.sendFile("addProducts.html", { root: path.join(__dirname, "public") });
+  res.status(200).json();
 });
 app.get("/login", (req, res) => {
   res.status(200).json();
