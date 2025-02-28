@@ -29,6 +29,9 @@ app.use("/api/product", requireAuth, productRoute);
 app.use(authRoute);
 
 app.get("*", checkUser);
+app.get("/", (req, res) => {
+  res.status(200).json("welcome");
+});
 app.get("/add-product", requireAuth, (req, res) => {
   res.sendFile("addProducts.html", { root: path.join(__dirname, "public") });
 });
