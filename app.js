@@ -38,9 +38,7 @@ app.get("/add-product", requireAuth, (req, res) => {
 app.get("/login", (req, res) => {
   res.status(200).json();
 });
-app.get("/api/properties", getProperties, (req, res) => {
-  res.status(200).json();
-});
+app.get("/api/properties", getProperties);
 
 app.get("/api/user", (req, res) => {
   console.log("load");
