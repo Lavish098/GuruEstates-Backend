@@ -1,22 +1,21 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
-const dotenv = require('dotenv')
+const dotenv = require("dotenv");
 
-dotenv.config()
-
+dotenv.config();
 
 //Handle errors
 const handleErrors = (err) => {
   console.log(err.message, err.code);
-  let errors = { surname: "", firstname: "", email: "", password: "" };
+  let errors = { lastname: "", firstname: "", email: "", password: "" };
 
   //incorrect email
-  if (err.message === 'incorrect email'){
-    errors.email = 'that email is not registered'
+  if (err.message === "incorrect email") {
+    errors.email = "that email is not registered";
   }
- //incorrect password
- if (err.message === 'incorrect password'){
-    errors.password = 'that password is incorrect'
+  //incorrect password
+  if (err.message === "incorrect password") {
+    errors.password = "that password is incorrect";
   }
   //duplicate error code
   if (err.code === 11000) {
@@ -36,7 +35,7 @@ const handleErrors = (err) => {
 //create token
 const maxAge = 3 * 24 * 60 * 60;
 
-const jwtsecret =  process.env.TOKEN_SECRET
+const jwtsecret = process.env.TOKEN_SECRET;
 
 const createToken = (id) => {
   return jwt.sign({ id }, jwtsecret, {
@@ -45,12 +44,19 @@ const createToken = (id) => {
 };
 
 const addUser = async (req, res) => {
-  const { surname, firstname, email, password } = req.body;
+  const { lastname, firstname, email, password, role, phone } = req.body;
   try {
-    const user = await User.create({ surname, firstname, email, password });
+    const user = await User.create({
+      lastname,
+      firstname,
+      email,
+      password,
+      role,
+      phone,
+    });
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
-    res.status(201).json({ user: user._id });
+    res.status(201).json(user);
   } catch (err) {
     const errors = handleErrors(err);
     res.status(400).json(errors);
@@ -64,18 +70,18 @@ const getUser = async (req, res) => {
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id });
   } catch (err) {
-    const errors = handleErrors(err)
+    const errors = handleErrors(err);
     res.status(400).json({ errors });
   }
 };
 
 const removeUser = (req, res) => {
-    res.cookie('jwt', '', {maxAge: 1});
-    res.redirect('/')
-}
+  res.cookie("jwt", "", { maxAge: 1 });
+  res.redirect("/");
+};
 
 module.exports = {
   addUser,
   getUser,
-  removeUser
+  removeUser,
 };
