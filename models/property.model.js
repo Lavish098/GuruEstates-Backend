@@ -21,6 +21,7 @@ const properties = [
     description:
       "This beautiful modern apartment is located in the heart of downtown, offering easy access to shops, restaurants, and public transportation. With spacious living areas and contemporary finishes, it is perfect for urban living.",
   },
+
   {
     id: "2",
     title: "Cozy Suburban Home",

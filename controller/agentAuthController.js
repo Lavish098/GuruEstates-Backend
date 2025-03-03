@@ -85,7 +85,7 @@ const getAgent = async (req, res) => {
     res.status(200).json(user);
   } catch (err) {
     const errors = handleErrors(err);
-    res.status(400).json({ errors });
+    res.status(400).json(errors);
   }
 };
 
