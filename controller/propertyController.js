@@ -1,10 +1,10 @@
-const properties = require("../models/property.model");
-const Properties = require("../models/propertyDB.model");
+// const properties = require("../models/property.model");
+const Property = require("../models/property.model");
 
 const getProperties = async (req, res) => {
   try {
-    // const products = await Product.find({});
-    res.status(200).json(properties);
+    const property = await Property.find({});
+    res.status(200).json(property);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -20,11 +20,27 @@ const getProduct = async (req, res) => {
   }
 };
 
-const addProduct = async (req, res) => {
+const addProperty = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
-    res.status(200).json(product);
+    let imageBase64Array = "";
+
+    if (req.files) {
+      imageBase64Array = req.files.map((file) =>
+        file.buffer.toString("base64")
+      );
+    }
+    const storyData = {
+      ...req.body,
+      images: imageBase64Array, // Store the image as a base64 string
+    };
+
+    console.log(storyData);
+    const property = await Property.create(storyData);
+
+    res.status(200).json(property);
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -58,7 +74,7 @@ const deleteProducts = async (req, res) => {
 module.exports = {
   getProperties,
   getProduct,
-  addProduct,
+  addProperty,
   updateProduct,
   deleteProducts,
 };

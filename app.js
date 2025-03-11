@@ -4,11 +4,10 @@ const cors = require("cors");
 const path = require("path");
 const cookies = require("cookie-parser");
 const dotenv = require("dotenv");
-const productRoute = require("./routes/propertyRoutes.js");
+const propertyRoute = require("./routes/propertyRoutes.js");
 const authRoute = require("./routes/authRoutes.js");
 const { requireAuth, checkUser } = require("./middleware/authMiddleware.js");
 const { getProperties } = require("./controller/propertyController.js");
-const products = require("./models/property.model.js");
 const app = express();
 
 const port = process.env.port || 3001;
@@ -25,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookies());
 
-app.use("/api/product", requireAuth, productRoute);
+app.use("/api/property", propertyRoute);
 app.use(authRoute);
 
 app.get("*", checkUser);
