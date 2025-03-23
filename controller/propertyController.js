@@ -22,20 +22,12 @@ const getProduct = async (req, res) => {
 
 const addProperty = async (req, res) => {
   try {
-    let imageBase64Array = "";
-
-    if (req.files) {
-      imageBase64Array = req.files.map((file) =>
-        file.buffer.toString("base64")
-      );
-    }
-    const storyData = {
+    const propertyData = {
       ...req.body,
-      images: imageBase64Array, // Store the image as a base64 string
     };
 
-    console.log(storyData);
-    const property = await Property.create(storyData);
+    console.log(propertyData);
+    const property = await Property.create(propertyData);
 
     res.status(200).json(property);
   } catch (error) {

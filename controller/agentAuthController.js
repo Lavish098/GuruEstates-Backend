@@ -88,6 +88,20 @@ const getAgent = async (req, res) => {
     res.status(400).json(errors);
   }
 };
+const findAgent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+
+    const agent = await Agent.findById(id);
+    console.log(agent);
+    res.status(200).json(agent);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const removeUser = (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
@@ -98,4 +112,5 @@ module.exports = {
   addAgent,
   getAgent,
   removeUser,
+  findAgent,
 };
