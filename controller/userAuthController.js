@@ -77,14 +77,31 @@ const getUser = async (req, res) => {
 const findUser = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
-
     const user = await User.findById(id);
-    console.log(user);
     res.status(200).json(user);
   } catch (error) {
     console.log(error);
 
+    res.status(500).json({ message: error.message });
+  }
+};
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(req.body);
+
+    const user = await User.findByIdAndUpdate(id, req.body);
+
+    console.log(user);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const updatedUser = await User.findById(id);
+    console.log(updatedUser);
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -99,4 +116,5 @@ module.exports = {
   getUser,
   removeUser,
   findUser,
+  updateUser,
 };

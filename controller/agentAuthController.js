@@ -103,6 +103,25 @@ const findAgent = async (req, res) => {
   }
 };
 
+const updateAgent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const agentData = { ...req.body };
+    console.log(agentData);
+    const agent = await Agent.findByIdAndUpdate(id, req.body);
+
+    if (!agent) {
+      return res.status(404).json({ message: "Agent not found" });
+    }
+    const updatedAgent = await Agent.findById(id);
+    console.log(updatedAgent);
+
+    res.status(200).json(updatedAgent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const removeUser = (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
   res.redirect("/");
@@ -113,4 +132,5 @@ module.exports = {
   getAgent,
   removeUser,
   findAgent,
+  updateAgent,
 };

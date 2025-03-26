@@ -23,6 +23,9 @@ const AgentSchema = mongoose.Schema({
     required: [true, "Please enter a password"],
     minlength: [6, "Minimum of 6 characters"],
   },
+  address: {
+    type: String,
+  },
   phone: {
     type: Number,
     required: [true, "Please enter a phone number"],
