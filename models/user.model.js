@@ -34,7 +34,30 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+  },
 });
+
+// Image Schema
+const ImageSchema = mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User ",
+    },
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
+    secure_url: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
 //fire a function before doc is saved to db
 UserSchema.pre("save", async function (next) {
@@ -57,4 +80,9 @@ UserSchema.statics.login = async function (email, password) {
 };
 const User = mongoose.model("User", UserSchema);
 
-module.exports = User;
+const Image = mongoose.model("Image", ImageSchema);
+
+module.exports = {
+  User,
+  Image,
+};

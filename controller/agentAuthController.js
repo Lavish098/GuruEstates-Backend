@@ -1,6 +1,7 @@
-const Agent = require("../models/agent.model");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const { Agent, AgentImage } = require("../models/agent.model");
+// const AgentImage = require("../models/agent.model");
 
 dotenv.config();
 
@@ -94,8 +95,9 @@ const findAgent = async (req, res) => {
     console.log(id);
 
     const agent = await Agent.findById(id);
+    const image = await AgentImage.findOne({ userId: id });
     console.log(agent);
-    res.status(200).json(agent);
+    res.status(200).json({ agent, image });
   } catch (error) {
     console.log(error);
 
@@ -106,18 +108,72 @@ const findAgent = async (req, res) => {
 const updateAgent = async (req, res) => {
   try {
     const { id } = req.params;
-    const agentData = { ...req.body };
-    console.log(agentData);
-    const agent = await Agent.findByIdAndUpdate(id, req.body);
+
+    const {
+      lastname,
+      firstname,
+      email,
+      password,
+      phone,
+      agency,
+      experience,
+      bio,
+      role,
+      address,
+      profileImg,
+    } = req.body;
+
+    const agentData = {
+      lastname,
+      firstname,
+      email,
+      password,
+      phone,
+      agency,
+      experience,
+      bio,
+      role,
+      address,
+    };
+
+    const agent = await Agent.findByIdAndUpdate(id, agentData, { new: true });
 
     if (!agent) {
       return res.status(404).json({ message: "Agent not found" });
     }
-    const updatedAgent = await Agent.findById(id);
-    console.log(updatedAgent);
+
+    console.log(profileImg);
+
+    // If a new image is provided, update the image record
+    if (!profileImg && !profileImg.newImageUrl && !profileImg.newPublicId) {
+      console.log("No new profile image data provided.");
+    } else {
+      if (profileImg.newPublicId) {
+        console.log(profileImg.newImageUrl);
+
+        // Delete previous image record if exists
+        await AgentImage.findOneAndDelete({ userId: id });
+
+        const public_id = profileImg.newPublicId;
+        const url = profileImg.newImageUrl; // Create a new image record
+        const newImage = await AgentImage.create({
+          url,
+          public_id,
+          userId: id,
+        });
+
+        // Update agent with reference to the new image
+        agent.image = newImage._id;
+        await agent.save();
+      }
+    }
+    const updatedAgent = await Agent.findById(id).populate("image");
+    // console.log(updatedAgent);
 
     res.status(200).json(updatedAgent);
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: error.message });
   }
 };

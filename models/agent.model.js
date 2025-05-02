@@ -15,7 +15,7 @@ const AgentSchema = mongoose.Schema({
     type: String,
     required: [true, "Please enter a email"],
     unique: true,
-    lowercases: true,
+    lowercase: true,
     validate: [isEmail, "Please enter a vaild email"],
   },
   password: {
@@ -45,7 +45,30 @@ const AgentSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+  },
 });
+
+// Image Schema
+const AgentImageSchema = mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User ",
+    },
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
+    secure_url: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
 //fire a function before doc is saved to db
 AgentSchema.pre("save", async function (next) {
@@ -67,5 +90,9 @@ AgentSchema.statics.login = async function (email, password) {
   throw Error("incorrect email");
 };
 const Agent = mongoose.model("Agents", AgentSchema);
+const AgentImage = mongoose.model("AgentImage", AgentImageSchema);
 
-module.exports = Agent;
+module.exports = {
+  Agent,
+  AgentImage,
+};

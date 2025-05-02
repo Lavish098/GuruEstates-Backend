@@ -1,4 +1,4 @@
-const User = require("../models/user.model");
+const { User, Image } = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
@@ -78,7 +78,9 @@ const findUser = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
-    res.status(200).json(user);
+    const image = await Image.findOne({ userId: id });
+
+    res.status(200).json({ user, image });
   } catch (error) {
     console.log(error);
 
@@ -88,20 +90,53 @@ const findUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(req.body);
 
-    const user = await User.findByIdAndUpdate(id, req.body);
+    const { lastname, firstname, email, phone, address, profileImg } = req.body;
 
-    console.log(user);
+    const userData = {
+      lastname,
+      firstname,
+      email,
+      phone,
+      address,
+    };
+
+    const user = await User.findByIdAndUpdate(id, userData, { new: true });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const updatedUser = await User.findById(id);
-    console.log(updatedUser);
+
+    console.log(profileImg);
+
+    // If a new image is provided, update the image record
+    if (!profileImg && !profileImg.newImageUrl && !profileImg.newPublicId) {
+      console.log("No new profile image data provided.");
+    } else {
+      console.log(profileImg.newImageUrl);
+
+      // Only delete the previous image if new image data is provided
+      if (profileImg.newPublicId) {
+        // Delete previous image record if exists
+        await Image.findOneAndDelete({ userId: id });
+
+        const public_id = profileImg.newPublicId;
+        const url = profileImg.newImageUrl; // Create a new image record
+
+        const newImage = await Image.create({ url, public_id, userId: id });
+
+        // Update agent with reference to the new image
+        user.image = newImage._id;
+        await user.save();
+      }
+    }
+    const updatedUser = await User.findById(id).populate("image");
+    // console.log(updatedAgent);
 
     res.status(200).json(updatedUser);
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({ message: error.message });
   }
 };

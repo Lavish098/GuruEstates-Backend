@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const cookies = require("cookie-parser");
 const dotenv = require("dotenv");
+const cloudinary = require("cloudinary").v2;
 const propertyRoute = require("./routes/propertyRoutes.js");
 const authRoute = require("./routes/authRoutes.js");
 const { requireAuth, checkUser } = require("./middleware/authMiddleware.js");
@@ -17,6 +18,13 @@ const corsOptions = {
   optionSuccessStatus: 200,
   port: port,
 };
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 dotenv.config();
 
 app.use(express.json());
@@ -31,12 +39,21 @@ app.get("*", checkUser);
 app.get("/", (req, res) => {
   res.status(200).json("welcome");
 });
-app.get("/add-product", requireAuth, (req, res) => {
-  res.status(200).json();
+
+app.post("/image/delete", async (req, res) => {
+  const { public_id } = req.body;
+  console.log(public_id);
+
+  try {
+    const result = await cloudinary.uploader.destroy(public_id);
+    console.log(result);
+
+    res.json({ result });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
-app.get("/login", (req, res) => {
-  res.status(200).json();
-});
+
 app.get("/api/properties", getProperties);
 
 app.get("/api/user", (req, res) => {
